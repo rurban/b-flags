@@ -1,5 +1,9 @@
 Revision history for Perl extension B::Flags.
 
+0.02  2008-03-02 22:11:08 rurban@cpan.org
+	- updates for 5.10 and 5.11@33408
+	- prefixed op want flags with "WANT_"
+
 0.01  Sun May 13 19:35:25 2001
 	- original version; created by h2xs 1.20 with options
 		-A -n B::Flags
