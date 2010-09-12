@@ -1,26 +1,38 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl test.pl'
+use Test::More tests => 16;
+BEGIN { use_ok( 'B::Flags' ); }
 
-######################### We start with some black magic to print on failure.
+ok B::main_root->flagspv =~ /VOID/, "main_root VOID";
+ok B::main_root->privatepv =~ /REFCOUNTED/, "main_root->privatepv REFCOUNTED";
+ok B::svref_2object(\3)->flagspv =~ /READONLY/, "warning 3 READONLY";
 
-# Change 1..1 below to 1..last_test_to_print .
-# (It may become useful if the test is moved to ./t subdirectory.)
+# for AV, CV and GV print its flags combined and splitted
+my @a = (0..4);
+my $SVt_PVAV = $] < 5.010 ? 10 : 11;
+my $EVALED = $] < 5.010 ? '' : 'EVALED';
+my $av = B::svref_2object( \@a );
+ok $av->flagspv =~ /^PAD/, "default ".$av->flagspv." both flags";
+ok $av->flagspv($SVt_PVAV) eq $EVALED, $av->flagspv($SVt_PVAV)." AvFLAGS only";
+ok $av->flagspv(0) eq $av->flagspv, $av->flagspv(0)." SvFLAGS only";
 
-BEGIN { $| = 1; print "1..4\n"; }
-END {print "not ok 1\n" unless $loaded;}
-use B::Flags;
-$loaded = 1;
-print "ok 1\n";
+sub mycv {my $n=1; 1}
+my $cv = B::svref_2object( \&main::mycv );
+my $pad = ($cv->PADLIST->ARRAY)[1];
+SKIP: {
+  skip "need AvFLAGS for pad",3 if $] < 5.010;
+  ok $pad->flagspv eq 'REAL,EVALED', "default ".$pad->flagspv." both flags";
+  ok $pad->flagspv($SVt_PVAV) =~ /^EVALED/, $pad->flagspv($SVt_PVAV)." AvFLAG only";
+  ok $pad->flagspv(0) eq 'REAL,EVALED', $pad->flagspv(0)." SvFLAGS only - fallthrough";
+}
 
-######################### End of black magic.
+sub lvalcv:lvalue {my $n=1;}
+my $SVt_PVCV = $] < 5.010 ? 12 : 13;
+my $cv = B::svref_2object( \&main::lvalcv );
+ok $cv->flagspv =~ /LVALUE/, $cv->flagspv." SvFLAGS+CvFLAGS";
+ok $cv->flagspv($SVt_PVCV) =~ /^LVALUE/, $cv->flagspv($SVt_PVCV)." CvFLAGS only";
+ok $cv->flagspv(0) !~ /LVALUE/, $cv->flagspv(0)." SvFLAGS only";
 
-# Insert your test code below (better if it prints "ok 13"
-# (correspondingly "not ok 13") depending on the success of chunk 13
-# of the test code):
-
-print "not " unless B::main_root->flagspv =~ /VOID/;
-print "ok 2\n";
-print "not " unless B::main_root->privatepv =~ /REFCOUNTED/;
-print "ok 3\n";
-print "not " unless B::svref_2object(\3)->flagspv =~ /READONLY/;
-print "ok 4\n";
+my $SVt_PVGV = $] < 5.010 ? 13 : 9;
+my $gv = B::svref_2object( \*mycv );
+ok $gv->flagspv =~ /MULTI/, $gv->flagspv." SvFLAGS+GvFLAGS";
+ok $gv->flagspv($SVt_PVGV) =~ /^MULTI/, $gv->flagspv($SVt_PVGV)." GvFLAGS only";
+ok $gv->flagspv(0) !~ /MULTI/, $gv->flagspv(0)." SvFLAGS only";

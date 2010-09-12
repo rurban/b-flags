@@ -1,3 +1,4 @@
+/* -*- mode:c tabwidth:4 -*- */
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -128,8 +129,8 @@ privatepv(o)
                 sv_catpv(RETVAL, ",GROWS");
 #endif
         }
-        else if (o->op_type == OP_REPEAT) {
 #ifdef OPpREPEAT_DOLIST
+        else if (o->op_type == OP_REPEAT) {
             if (o->op_private & OPpREPEAT_DOLIST)
                 sv_catpv(RETVAL, ",DOLIST");
 #endif
@@ -245,7 +246,7 @@ privatepv(o)
         else if (o->op_type == OP_FLOP) {
             if (o->op_private & OPpFLIP_LINENUM)
                 sv_catpv(RETVAL, ",LINENUM");
-        } 
+        }
 #endif
         else if (o->op_type == OP_RV2CV) {
 #ifdef OPpLVAL_INTRO
@@ -353,15 +354,19 @@ privatepv(o)
             sv_catpv(RETVAL, ",INTRO");
 #endif
 #ifdef OP_IS_FILETEST_ACCESS
+# if (PERL_VERSION < 11)
 	if (OP_IS_FILETEST_ACCESS(o)) {
-#ifdef OPpFT_ACCESS
+# else
+	if (OP_IS_FILETEST_ACCESS(o->op_type)) {
+# endif
+# ifdef OPpFT_ACCESS
             if (o->op_private & OPpFT_ACCESS)
                 sv_catpv(RETVAL, ",FT_ACCESS");
-#endif
-#ifdef OPpFT_STACKED
+# endif
+# ifdef OPpFT_STACKED
             if (o->op_private & OPpFT_STACKED)
                 sv_catpv(RETVAL, ",FT_STACKED");
-#endif
+# endif
 	}
 #endif
 #ifdef OPpGREP_LEX
@@ -388,14 +393,16 @@ privatepv(o)
 MODULE = B::Flags		PACKAGE = B::SV
 
 SV*
-flagspv(sv)
+flagspv(sv, type=-1)
     B::SV sv
+    I32 type
     U32 flags = NO_INIT
-    U32 type  = NO_INIT
+    U32 sv_type = NO_INIT
     CODE:
         RETVAL = newSVpvn("", 0);
         flags = SvFLAGS(sv);
-        type = SvTYPE(sv);
+        sv_type = SvTYPE(sv);
+        if (type <= 0) {
 #ifdef SVs_PADBUSY
         if (flags & SVs_PADBUSY)    sv_catpv(RETVAL, "PADBUSY,");
 #endif
@@ -431,18 +438,26 @@ flagspv(sv)
         if (SvVOK(sv))              sv_catpv(RETVAL, "VOK,");
 #endif
 #ifdef SVphv_CLONEABLE /* since 5.8.8 */
-        if (flags & SVphv_CLONEABLE && type == SVt_PVHV)
+        if ((flags & SVphv_CLONEABLE) && (sv_type == SVt_PVHV))
 				    sv_catpv(RETVAL, "CLONEABLE,");
         else
 #endif
 #ifdef SVpgv_GP /* since 5.10 */
-	  if (flags & SVpgv_GP && type == SVt_PVGV)
+	  if ((flags & SVpgv_GP) && (sv_type == SVt_PVGV))
 				    sv_catpv(RETVAL, "isGV_with_GP,");
-        else
+          else
 #endif
-	  if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
-
-        switch (type) {
+	if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
+#ifdef SVpav_REAL
+        if ((flags & SVpav_REAL) && (sv_type == SVt_PVAV))
+            sv_catpv(RETVAL, "REAL,");
+#endif
+#ifdef SVpav_REIFY
+        if ((flags & SVpav_REIFY) && (sv_type == SVt_PVAV)) 
+            sv_catpv(RETVAL, "REIFY,");
+#endif
+	}
+        switch (type == -1 ? sv_type : type) {
         case SVt_PVCV:
         case SVt_PVFM:
             if (CvANON(sv))         sv_catpv(RETVAL, "ANON,");
@@ -483,14 +498,6 @@ flagspv(sv)
         case SVt_PVHV:
             if (HvSHAREKEYS(sv))    sv_catpv(RETVAL, "SHAREKEYS,");
             if (HvLAZYDEL(sv))      sv_catpv(RETVAL, "LAZYDEL,");
-            break;
-        case SVt_PVAV:
-#ifdef SVpav_REAL
-            if (flags & SVpav_REAL)  sv_catpv(RETVAL, "REAL,");
-#endif
-#ifdef SVpav_REIFY
-            if (flags & SVpav_REIFY) sv_catpv(RETVAL, "REIFY,");
-#endif
             break;
         case SVt_PVGV:
             if (GvINTRO(sv))        sv_catpv(RETVAL, "INTRO,");

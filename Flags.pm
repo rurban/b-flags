@@ -9,7 +9,7 @@ use warnings;
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 bootstrap B::Flags $VERSION;
 
@@ -17,7 +17,6 @@ bootstrap B::Flags $VERSION;
 
 1;
 __END__
-# Below is stub documentation for your module. You better edit it!
 
 =head1 NAME
 
@@ -42,6 +41,29 @@ B<Warning>: This module is not I<guaranteed> compatible with any version
 of Perl below 5.7.0; however, I'd like to make it so compatible, so if
 it fails to compile, mail me. There's probably an C<#ifdef> I need to
 add somewhere...
+
+=head1 METHODS
+
+=over
+
+=item OP->flagspv
+
+Returns stringification of the OP flags.
+
+=item OP->privatepv
+
+Returns stringification of the OP private flags.
+
+=item SV->flagspv [type]
+
+Returns stringification of the SV flags.
+
+With the optional type only the flags for the given SvTYPE are used.
+type 0 is for the SvFLAGS only.
+This way you can seperate between sv->FLAGS and specialized AvFLAGS,
+GvFLAGS, CvFLAGS, ... in seperate struct fields.
+
+=back
 
 =head1 AUTHOR
 

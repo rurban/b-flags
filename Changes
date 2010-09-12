@@ -1,5 +1,14 @@
 Revision history for Perl extension B::Flags.
 
+0.04  2010-09-11 rurban@cpan.org
+	- add doc for the methods
+        - new optional type argument for SV->flagspv
+          to seperate between sv->FLAGS and special
+          AvFLAGS, GvFLAGS, CvFLAGS, ...
+          type 0 is for SvFLAGS only.
+        - fix OP_IS_FILETEST_ACCESS arg
+        - convert tests to Test::More
+
 0.03  Thu Jul 29 19:33:20 2010 rurban@cpan.org
 	- updates for 5.14
 	- several new svflags
