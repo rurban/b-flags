@@ -6,6 +6,7 @@ typedef OP  *B__OP;
 typedef SV  *B__SV;
 
 MODULE = B::Flags		PACKAGE = B::OP		
+PROTOTYPES: DISABLE
 
 SV*
 flagspv(o)
@@ -399,7 +400,7 @@ flagspv(sv)
         if (flags & SVs_PADBUSY)    sv_catpv(RETVAL, "PADBUSY,");
 #endif
 #ifdef SVs_PADSTALE
-        if (flags & SVs_PADSTALE)    sv_catpv(RETVAL, "PADSTALE,");
+        if (flags & SVs_PADSTALE)   sv_catpv(RETVAL, "PADSTALE,");
 #endif
         if (flags & SVs_PADTMP)     sv_catpv(RETVAL, "PADTMP,");
         if (flags & SVs_PADMY)      sv_catpv(RETVAL, "PADMY,");
@@ -426,13 +427,31 @@ flagspv(sv)
         if (flags & SVp_IOK)        sv_catpv(RETVAL, "pIOK,");
         if (flags & SVp_NOK)        sv_catpv(RETVAL, "pNOK,");
         if (flags & SVp_POK)        sv_catpv(RETVAL, "pPOK,");
-        if (flags & SVp_SCREAM)     sv_catpv(RETVAL, "SCREAM,");
+#ifdef SvVOK
+        if (SvVOK(sv))              sv_catpv(RETVAL, "VOK,");
+#endif
+#ifdef SVphv_CLONEABLE /* since 5.8.8 */
+        if (flags & SVphv_CLONEABLE && type == SVt_PVHV)
+				    sv_catpv(RETVAL, "CLONEABLE,");
+        else
+#endif
+#ifdef SVpgv_GP /* since 5.10 */
+	  if (flags & SVpgv_GP && type == SVt_PVGV)
+				    sv_catpv(RETVAL, "isGV_with_GP,");
+        else
+#endif
+	  if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
 
         switch (type) {
         case SVt_PVCV:
         case SVt_PVFM:
             if (CvANON(sv))         sv_catpv(RETVAL, "ANON,");
+#ifdef CvEVAL
+            if (CvEVAL(sv))         sv_catpv(RETVAL, "EVAL,");
+	    else if (CvUNIQUE(sv))  sv_catpv(RETVAL, "UNIQUE,");
+#else
             if (CvUNIQUE(sv))       sv_catpv(RETVAL, "UNIQUE,");
+#endif
             if (CvCLONE(sv))        sv_catpv(RETVAL, "CLONE,");
             if (CvCLONED(sv))       sv_catpv(RETVAL, "CLONED,");
 #ifdef CvCONST
@@ -440,8 +459,26 @@ flagspv(sv)
 #endif
             if (CvNODEBUG(sv))      sv_catpv(RETVAL, "NODEBUG,");
             if (SvCOMPILED(sv))     sv_catpv(RETVAL, "COMPILED,");
+#ifdef CVf_BUILTIN_ATTRS
+	    if (CvFLAGS(sv) == CVf_BUILTIN_ATTRS) 
+	                            sv_catpv(RETVAL, "BUILTIN_ATTRS,");
+	    else {
+	      if (CvLVALUE(sv))     sv_catpv(RETVAL, "LVALUE,");
+	      if (CvMETHOD(sv))     sv_catpv(RETVAL, "METHOD,");
+	    }
+#else
             if (CvLVALUE(sv))       sv_catpv(RETVAL, "LVALUE,");
             if (CvMETHOD(sv))       sv_catpv(RETVAL, "METHOD,");
+#endif
+#ifdef CvWEAKOUTSIDE
+            if (CvWEAKOUTSIDE(sv))  sv_catpv(RETVAL, "WEAKOUTSIDE,");
+#endif
+#ifdef CvISXSUB
+            if (CvISXSUB(sv))       sv_catpv(RETVAL, "ISXSUB,");
+#endif
+#ifdef CvCVGV_RC
+            if (CvCVGV_RC(sv))      sv_catpv(RETVAL, "CVGV_RC,");
+#endif
             break;
         case SVt_PVHV:
             if (HvSHAREKEYS(sv))    sv_catpv(RETVAL, "SHAREKEYS,");
@@ -464,9 +501,9 @@ flagspv(sv)
             if (GvASSUMECV(sv))     sv_catpv(RETVAL, "ASSUMECV,");
             if (GvIN_PAD(sv))       sv_catpv(RETVAL, "IN_PAD,");
             if (GvIMPORTED(sv)) {
-                sv_catpv(RETVAL, "IMPORT");
+                sv_catpv(RETVAL, "IMPORTED");
                 if (GvIMPORTED(sv) == GVf_IMPORTED)
-                    sv_catpv(RETVAL, "ALL,");
+                    sv_catpv(RETVAL, "_ALL,");
                 else {
                     sv_catpv(RETVAL, "(");
                     if (GvIMPORTED_SV(sv))  sv_catpv(RETVAL, " SV");
