@@ -4,5 +4,6 @@ Flags.xs
 typemap
 MANIFEST
 Makefile.PL
+META.yml
+README
 test.pl
-META.yml                                 Module meta-data (added by MakeMaker)

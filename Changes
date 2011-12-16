@@ -1,5 +1,8 @@
 Revision history for Perl extension B::Flags.
 
+0.05  2011-12-15 rurban@cpan.org
+	- fix for apple clang 1.7 (LLVM 2.9svn), works okay with clang 3.1
+
 0.04  2010-09-11 rurban@cpan.org
 	- add doc for the methods
         - new optional type argument for SV->flagspv

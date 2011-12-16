@@ -9,7 +9,7 @@ use warnings;
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 bootstrap B::Flags $VERSION;
 
@@ -69,6 +69,12 @@ GvFLAGS, CvFLAGS, ... in seperate struct fields.
 
 Simon Cozens, simon@cpan.org
 
+=head1 MAINTAINER
+
+Abhijit Menon-Sen, ams@cpan.org
+
+Reini Urban, rurban@cpan.org
+
 =head1 SEE ALSO
 
 perl(1).
@@ -77,5 +83,6 @@ perl(1).
 
 AL&GPL.
 Copyright 2001 Simon Cozens
+Copyright 2010 Reini Urban
 
 =cut
