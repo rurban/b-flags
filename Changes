@@ -1,5 +1,9 @@
 Revision history for Perl extension B::Flags.
 
+0.06  2012-03-06 rurban@cpan.org
+	- fix heap-buffer-overflow detected by address-sanitizer
+          with empty sv->flagspv
+
 0.05  2011-12-15 rurban@cpan.org
 	- fix for apple clang 1.7 (LLVM 2.9svn), works okay with clang 3.1
 

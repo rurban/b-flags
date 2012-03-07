@@ -531,7 +531,7 @@ flagspv(sv, type=-1)
             if (SvVALID(sv))        sv_catpv(RETVAL, "VALID,");
             break;
         }
-        if (*(SvEND(RETVAL) - 1) == ',') {
+        if (SvCUR(RETVAL) && (*(SvEND(RETVAL) - 1) == ',')) {
 #if defined(__clang__) && __clang_major__ <= 1 && __clang_minor__ < 8
 	  --SvCUR(RETVAL);
 	  SvPVX(RETVAL)[SvCUR(RETVAL)] = '\0';
