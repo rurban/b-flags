@@ -477,11 +477,6 @@ flagspv(sv, type=-1)
 				    sv_catpv(RETVAL, "isGV_with_GP,");
           else
 #endif
-#ifdef SVprv_PCS_IMPORTED /* since 5.8.9, RV is a proxy for a constant */
-          if (flags & (SVf_ROK|SVprv_PCS_IMPORTED))
-				    sv_catpv(RETVAL, "PCS_IMPORTED,");
-          else
-#endif
 #ifdef SVpad_NAMELIST /* since 5.19.3 */
 	  if ((flags & SVpad_NAMELIST) && (sv_type == SVt_PVAV))
 				    sv_catpv(RETVAL, "PADNAMELIST,");
@@ -494,6 +489,11 @@ flagspv(sv, type=-1)
             if (flags & SVpad_OUR)    sv_catpv(RETVAL, "OUR,");
             if (flags & SVpad_STATE)  sv_catpv(RETVAL, "STATE,");
           }
+          else
+#endif
+#ifdef SVprv_PCS_IMPORTED /* since 5.8.9, RV is a proxy for a constant */
+          if (flags & (SVf_ROK|SVprv_PCS_IMPORTED) == (SVf_ROK|SVprv_PCS_IMPORTED))
+				    sv_catpv(RETVAL, "PCS_IMPORTED,");
           else
 #endif
           if (flags & SVp_SCREAM)     sv_catpv(RETVAL, "SCREAM,");

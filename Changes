@@ -1,5 +1,8 @@
 Revision history for Perl extension B::Flags.
 
+0.08  2013-08-28 16:50:50 rurban@cpan.org
+	- fix wrong PCS_IMPORTED flag
+
 0.07  2013-08-28 11:40:39 rurban@cpan.org
 	- add to B::SV::flagspv: COW, THINKFIRST, PADNAME, PADNAMELIST,
 	  TYPED, OUR, STATE
