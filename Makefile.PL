@@ -5,6 +5,7 @@ WriteMakefile
    'VERSION_FROM'	=> 'Flags.pm',
    'AUTHOR'             => 'Simon Cozens <simon@cpan.org>, Reini Urban <rurban@cpan.org>',
    'ABSTRACT_FROM'      => 'Flags.pm',
+   'SIGN'               => 1,
    ($ExtUtils::MakeMaker::VERSION gt '6.46' ?
     ('META_MERGE'  =>
      {
