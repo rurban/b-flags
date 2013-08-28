@@ -3,6 +3,8 @@
 #include "perl.h"
 #include "XSUB.h"
 
+#define OPT_BITS
+
 typedef OP  *B__OP;
 typedef SV  *B__SV;
 
@@ -40,6 +42,34 @@ flagspv(o)
             sv_catpv(RETVAL, ",MOD");
         if (o->op_flags & OPf_SPECIAL)
             sv_catpv(RETVAL, ",SPECIAL");
+#ifdef OPT_BITS
+#if PERL_VERSION >= 10
+        if (o->op_opt)
+            sv_catpv(RETVAL, ",OPT");
+#if (PERL_VERSION == 17 && PERL_SUBVERSION < 3) || PERL_VERSION < 17
+        if (o->op_latefree)
+            sv_catpv(RETVAL, ",LATEFREE");
+        if (o->op_latefreed)
+            sv_catpv(RETVAL, ",LATEFREED");
+        if (o->op_attached)
+            sv_catpv(RETVAL, ",ATTACHED");
+#endif
+#if (PERL_VERSION == 17 && PERL_SUBVERSION >= 2) || PERL_VERSION >= 18
+        if (o->op_slabbed)
+            sv_catpv(RETVAL, ",SLABBED");
+        if (o->op_savefree)
+            sv_catpv(RETVAL, ",SAVEFREE");
+#if (PERL_VERSION == 17 && PERL_SUBVERSION >= 6) || PERL_VERSION >= 18
+        if (o->op_static)
+            sv_catpv(RETVAL, ",STATIC");
+#if (PERL_VERSION == 19 && PERL_SUBVERSION > 2) || PERL_VERSION >= 20
+        if (o->op_folded)
+            sv_catpv(RETVAL, ",FOLDED");
+#endif
+#endif
+#endif
+#endif
+#endif
         if (SvCUR(RETVAL))
             sv_chop(RETVAL, SvPVX(RETVAL)+1); /* Ow. */
     OUTPUT:
@@ -447,7 +477,26 @@ flagspv(sv, type=-1)
 				    sv_catpv(RETVAL, "isGV_with_GP,");
           else
 #endif
-	if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
+#ifdef SVprv_PCS_IMPORTED /* since 5.8.9, RV is a proxy for a constant */
+          if (flags & (SVf_ROK|SVprv_PCS_IMPORTED))
+				    sv_catpv(RETVAL, "PCS_IMPORTED,");
+          else
+#endif
+#ifdef SVpad_NAMELIST /* since 5.19.3 */
+	  if ((flags & SVpad_NAMELIST) && (sv_type == SVt_PVAV))
+				    sv_catpv(RETVAL, "PADNAMELIST,");
+          else
+#endif
+#ifdef SVpad_NAME /* since 5.10 */
+          if (flags & SVpad_NAME) {
+            sv_catpv(RETVAL, "PADNAME,");
+            if (flags & SVpad_TYPED)  sv_catpv(RETVAL, "TYPED,");
+            if (flags & SVpad_OUR)    sv_catpv(RETVAL, "OUR,");
+            if (flags & SVpad_STATE)  sv_catpv(RETVAL, "STATE,");
+          }
+          else
+#endif
+          if (flags & SVp_SCREAM)     sv_catpv(RETVAL, "SCREAM,");
 #ifdef SVpav_REAL
         if ((flags & SVpav_REAL) && (sv_type == SVt_PVAV))
             sv_catpv(RETVAL, "REAL,");
@@ -457,6 +506,14 @@ flagspv(sv, type=-1)
             sv_catpv(RETVAL, "REIFY,");
 #endif
 	}
+#ifdef SVf_IsCOW
+        if (flags & SVf_IsCOW)
+            sv_catpv(RETVAL, "COW,");
+#endif
+#ifdef SVf_THINKFIRST
+        if (flags & SVf_THINKFIRST)
+            sv_catpv(RETVAL, "THINKFIRST,");
+#endif
         switch (type == -1 ? sv_type : type) {
         case SVt_PVCV:
         case SVt_PVFM:
