@@ -556,6 +556,12 @@ flagspv(sv, type=-1)
             if (HvSHAREKEYS(sv))    sv_catpv(RETVAL, "SHAREKEYS,");
             if (HvLAZYDEL(sv))      sv_catpv(RETVAL, "LAZYDEL,");
             break;
+        case SVt_PVBM: /* == PVMG */
+            if (!(flags & SVp_SCREAM)) {
+                if (SvTAIL(sv))         sv_catpv(RETVAL, "TAIL,");
+                if (SvVALID(sv))        sv_catpv(RETVAL, "VALID,");
+            }
+            break;
         case SVt_PVGV:
             if (GvINTRO(sv))        sv_catpv(RETVAL, "INTRO,");
             if (GvMULTI(sv))        sv_catpv(RETVAL, "MULTI,");
@@ -582,10 +588,6 @@ flagspv(sv, type=-1)
             if (SvEVALED(sv))       sv_catpv(RETVAL, "EVALED,");
             if (SvIsUV(sv))         sv_catpv(RETVAL, "IsUV,");
             if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8");
-            break;
-        case SVt_PVBM:
-            if (SvTAIL(sv))         sv_catpv(RETVAL, "TAIL,");
-            if (SvVALID(sv))        sv_catpv(RETVAL, "VALID,");
             break;
         }
         if (SvCUR(RETVAL) && (*(SvEND(RETVAL) - 1) == ',')) {
