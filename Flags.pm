@@ -9,7 +9,7 @@ use warnings;
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 bootstrap B::Flags $VERSION;
 

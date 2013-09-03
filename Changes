@@ -1,5 +1,9 @@
 Revision history for Perl extension B::Flags.
 
+0.09  2013-09-03 10:12:08 rurban@cpan.org
+	- protect SvTAIL from SvSCREAM variables
+        - enable PVMG vars default flags: EVALED,IsUV,UTF8
+
 0.08  2013-08-28 16:50:50 rurban@cpan.org
 	- fix wrong PCS_IMPORTED flag
         - added gpg signature
