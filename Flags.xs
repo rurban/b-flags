@@ -492,8 +492,8 @@ flagspv(sv, type=-1)
           else
 #endif
 #ifdef SVprv_PCS_IMPORTED /* since 5.8.9, RV is a proxy for a constant */
-          if (flags & (SVf_ROK|SVprv_PCS_IMPORTED) == (SVf_ROK|SVprv_PCS_IMPORTED))
-				    sv_catpv(RETVAL, "PCS_IMPORTED,");
+          if (flags & SVf_ROK && flags & SVprv_PCS_IMPORTED)
+				      sv_catpv(RETVAL, "PCS_IMPORTED,");
           else
 #endif
           if (flags & SVp_SCREAM)     sv_catpv(RETVAL, "SCREAM,");
@@ -508,7 +508,8 @@ flagspv(sv, type=-1)
 	}
 #ifdef SVf_IsCOW
         if (flags & SVf_IsCOW)
-            sv_catpv(RETVAL, "COW,");
+            sv_catpv(RETVAL, "IsCOW,");
+        else
 #endif
 #ifdef SVf_THINKFIRST
         if (flags & SVf_THINKFIRST)

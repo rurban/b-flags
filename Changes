@@ -1,5 +1,11 @@
 Revision history for Perl extension B::Flags.
 
+0.10  2013-09-05 10:56:58 rurban
+        - align with core dump.c
+        - rename COW to IsCOW
+	- fix wrong PCS_IMPORTED flag
+        - dont print THINKFIRST on IsCOW
+
 0.09  2013-09-03 10:12:08 rurban@cpan.org
 	- protect SvTAIL from SvSCREAM variables
         - enable PVMG vars default flags: EVALED,IsUV,UTF8
