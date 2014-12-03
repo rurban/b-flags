@@ -9,8 +9,9 @@ ok B::svref_2object(\3)->flagspv =~ /READONLY/, "warning 3 READONLY";
 my @a = (0..4);
 my $SVt_PVAV = $] < 5.010 ? 10 : 11;
 my $EVALED = $] < 5.010 ? '' : 'EVALED';
+my $AVFlags = $] < 5.021007 ? 'PAD' : 'REAL';
 my $av = B::svref_2object( \@a );
-ok $av->flagspv =~ /^PAD/, "AV default ".$av->flagspv." both flags";
+ok $av->flagspv =~ /^$AVFlags/, "AV default ".$av->flagspv." both flags";
 ok $av->flagspv($SVt_PVAV) eq $EVALED, $av->flagspv($SVt_PVAV)." AvFLAGS only";
 ok $av->flagspv(0) eq $av->flagspv, $av->flagspv(0)." SvFLAGS only";
 

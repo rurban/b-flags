@@ -65,6 +65,10 @@ flagspv(o)
 #if (PERL_VERSION == 19 && PERL_SUBVERSION > 2) || PERL_VERSION >= 20
         if (o->op_folded)
             sv_catpv(RETVAL, ",FOLDED");
+#if (PERL_VERSION == 21 && PERL_SUBVERSION > 1) || PERL_VERSION >= 22
+        if (o->op_lastsib)
+            sv_catpv(RETVAL, ",LASTSIB");
+#endif
 #endif
 #endif
 #endif
@@ -457,6 +461,9 @@ flagspv(sv, type=-1)
         if (flags & SVf_OOK)        sv_catpv(RETVAL, "OOK,");
         if (flags & SVf_FAKE)       sv_catpv(RETVAL, "FAKE,");
         if (flags & SVf_READONLY)   sv_catpv(RETVAL, "READONLY,");
+#ifdef SVf_PROTECT
+        if (flags & SVf_PROTECT)    sv_catpv(RETVAL, "PROTECT,");
+#endif
 #ifdef SVf_BREAK
         if (flags & SVf_BREAK)      sv_catpv(RETVAL, "BREAK,");
 #endif

@@ -9,7 +9,7 @@ use warnings;
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 bootstrap B::Flags $VERSION;
 
@@ -31,16 +31,13 @@ B::Flags - Friendlier flags for B
 
 =head1 DESCRIPTION
 
+Stringification of flags.
+
 By default, C<$foo-E<gt>flags> when passed an object in the C<B> class
 will produce a relatively meaningless number, which one would need to
 grovel through the Perl source code in order to do anything useful with.
 This module adds C<flagspv> to the SV and op classes and C<privatepv> to
 the op classes, which makes them easier to understand.
-
-B<Warning>: This module is not I<guaranteed> compatible with any version
-of Perl below 5.7.0; however, I'd like to make it so compatible, so if
-it fails to compile, mail me. There's probably an C<#ifdef> I need to
-add somewhere...
 
 =head1 METHODS
 
@@ -63,6 +60,9 @@ type 0 is for the SvFLAGS only.
 This way you can seperate between sv->FLAGS and specialized AvFLAGS,
 GvFLAGS, CvFLAGS, ... in seperate struct fields.
 
+Note that only the names of bitmasked SV and OP flags are returned,
+not pseudo flags, like TAINTED, which is stored as magic.
+
 =back
 
 =head1 AUTHOR
@@ -83,6 +83,6 @@ perl(1).
 
 AL&GPL.
 Copyright 2001 Simon Cozens
-Copyright 2010,2013 Reini Urban
+Copyright 2010,2013,2014 Reini Urban
 
 =cut
