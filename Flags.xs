@@ -383,9 +383,18 @@ privatepv(o)
             if (o->op_private & OPpEXIT_VMSISH)
                 sv_catpv(RETVAL, ",EXIST_VMSISH");
 #endif
-#ifdef OPpHUSH_VMSISH
+#if PERL_VERSION < 19
+# ifdef OPpHUSH_VMSISH
             if (o->op_private & OPpHUSH_VMSISH)
                 sv_catpv(RETVAL, ",HUSH_VMSISH");
+# endif
+#else
+        }
+        else if (o->op_type == OP_NEXTSTATE || o->op_type == OP_DBSTATE) {
+# ifdef OPpHUSH_VMSISH
+            if (o->op_private & OPpHUSH_VMSISH)
+                sv_catpv(RETVAL, ",HUSH_VMSISH");
+# endif
 #endif
         }
 #ifdef OPpLVAL_INTRO
