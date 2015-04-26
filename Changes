@@ -1,5 +1,9 @@
 Revision history for Perl extension B::Flags.
 
+0.12  2015-04-27 rurban
+        - add more new 5.21.11 flags: MORESIB (Mathieu Arnold)
+        - but no -DPERL_OP_PARENT support yet.
+
 0.11  2014-12-03 rurban
         - add some new 5.21 flags: LASTSIB, PROTECT
         - fix test for 5.21.7, no PAD* flags anymore on lexical AVs

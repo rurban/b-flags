@@ -9,7 +9,7 @@ use warnings;
 require DynaLoader;
 our @ISA = qw(DynaLoader);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 bootstrap B::Flags $VERSION;
 
@@ -83,6 +83,6 @@ perl(1).
 
 AL&GPL.
 Copyright 2001 Simon Cozens
-Copyright 2010,2013,2014 Reini Urban
+Copyright 2010,2013,2014,2015 Reini Urban
 
 =cut
