@@ -3,6 +3,7 @@ NAME
 
 SYNOPSIS
       use B::Flags;
+      # some ops
       print B::main_root->flagspv;
       print B::main_root->privatepv;
       print $some_b_sv_object->flagspv;
@@ -19,6 +20,11 @@ DESCRIPTION
 METHODS
     OP->flagspv
         Returns stringification of the OP flags.
+
+        Adds now SIBLING to abstract the new LASTSIB/MORESIB flags since
+        5.21/5.22 and the old "op_sibling" pointer. Since 5.22 missing the
+        SIBLING flags indicates a PARENT at the "op_sibparent" pointer, with
+        -DPERL_OP_PARENT.
 
     OP->privatepv
         Returns stringification of the OP private flags.
@@ -46,6 +52,7 @@ SEE ALSO
     perl(1).
 
 LICENSE
-    AL&GPL. Copyright 2001 Simon Cozens Copyright 2010,2013,2014,2015 Reini
-    Urban
+    AL & GPL.
+
+    Copyright 2001 Simon Cozens Copyright 2010,2013,2014,2015 Reini Urban
 

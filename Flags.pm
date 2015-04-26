@@ -8,12 +8,9 @@ use warnings;
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 bootstrap B::Flags $VERSION;
-
-# Preloaded methods go here.
 
 1;
 __END__
@@ -25,6 +22,7 @@ B::Flags - Friendlier flags for B
 =head1 SYNOPSIS
 
   use B::Flags;
+  # some ops
   print B::main_root->flagspv;
   print B::main_root->privatepv;
   print $some_b_sv_object->flagspv;
@@ -46,6 +44,10 @@ the op classes, which makes them easier to understand.
 =item OP->flagspv
 
 Returns stringification of the OP flags.
+
+Adds now SIBLING to abstract the new LASTSIB/MORESIB flags since 5.21/5.22
+and the old C<op_sibling> pointer. Since 5.22 missing the SIBLING flags indicates
+a PARENT at the C<op_sibparent> pointer, with -DPERL_OP_PARENT.
 
 =item OP->privatepv
 
@@ -81,7 +83,8 @@ perl(1).
 
 =head1 LICENSE
 
-AL&GPL.
+AL & GPL.
+
 Copyright 2001 Simon Cozens
 Copyright 2010,2013,2014,2015 Reini Urban
 

@@ -451,6 +451,7 @@ flagspv(sv, type=-1)
     U32 sv_type = NO_INIT
     CODE:
         RETVAL = newSVpvn("", 0);
+        if (!sv) XSRETURN_UNDEF;
         flags = SvFLAGS(sv);
         sv_type = SvTYPE(sv);
         if (type <= 0) {

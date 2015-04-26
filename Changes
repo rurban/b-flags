@@ -1,8 +1,12 @@
 Revision history for Perl extension B::Flags.
 
-0.13  2015-04-?? rurban
+0.13  2015-04-27 rurban
 	- add HUSH_VMSISH
-        - add -DPERL_OP_PARENT support
+        - add -DPERL_OP_PARENT support, replace MORESIB and LASTSIB by SIBLING.
+          SIBLING appears now in <5.22 perl ops also as flag, even if it's a pointer,
+          to be consistent with 5.22.
+        - protect against B::NULL
+        - add README, release and test_cover make targets
 
 0.12  2015-04-27 rurban
         - add more new 5.21.11 flags: MORESIB (Mathieu Arnold)
