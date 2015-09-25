@@ -8,7 +8,7 @@ use warnings;
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 bootstrap B::Flags $VERSION;
 
@@ -73,9 +73,9 @@ Simon Cozens, simon@cpan.org
 
 =head1 MAINTAINER
 
-Abhijit Menon-Sen, ams@cpan.org
-
 Reini Urban, rurban@cpan.org
+
+Abhijit Menon-Sen, ams@cpan.org
 
 =head1 SEE ALSO
 

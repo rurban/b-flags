@@ -1,5 +1,8 @@
 Revision history for Perl extension B::Flags.
 
+0.14  2015-09-24 rurban
+	- add B::PADNAMELIST and B::PADNAME support and tests
+
 0.13  2015-04-27 rurban
 	- add HUSH_VMSISH
         - add -DPERL_OP_PARENT support, replace MORESIB and LASTSIB by SIBLING.

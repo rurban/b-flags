@@ -450,8 +450,8 @@ flagspv(sv, type=-1)
     U32 flags = NO_INIT
     U32 sv_type = NO_INIT
     CODE:
-        RETVAL = newSVpvn("", 0);
         if (!sv) XSRETURN_UNDEF;
+        RETVAL = newSVpvn("", 0);
         flags = SvFLAGS(sv);
         sv_type = SvTYPE(sv);
         if (type <= 0) {
@@ -502,9 +502,9 @@ flagspv(sv, type=-1)
 				    sv_catpv(RETVAL, "isGV_with_GP,");
           else
 #endif
-#ifdef SVpad_NAMELIST /* since 5.19.3 */
+#ifdef SVpad_NAMELIST /* 5.19.3 - 5.21 */
 	  if ((flags & SVpad_NAMELIST) && (sv_type == SVt_PVAV))
-				    sv_catpv(RETVAL, "PADNAMELIST,");
+				    sv_catpv(RETVAL, "PADNAME,");
           else
 #endif
 #ifdef SVpad_NAME /* since 5.10 */
@@ -626,3 +626,49 @@ flagspv(sv, type=-1)
 	}
     OUTPUT:
         RETVAL
+
+MODULE = B::Flags		PACKAGE = B::PADNAME
+
+#ifdef PadnameFLAGS
+
+SV*
+flagspv(sv, type=-1)
+    B::SV sv
+    I32 type
+    PADNAME *pn = NO_INIT
+    U32 flags = NO_INIT
+    U32 sv_type = NO_INIT
+    CODE:
+        if (!sv) XSRETURN_UNDEF;
+        RETVAL = newSVpvs("PADNAME,");
+        pn = (PADNAME*)sv;
+        flags = PadnameFLAGS(pn);
+	if (PadnameOUTER(pn)) 		sv_catpv(RETVAL, "OUTER,");
+        if (flags & PAD_FAKELEX_ANON)   sv_catpv(RETVAL, "PAD_FAKELEX_ANON,");
+        if (flags & PAD_FAKELEX_MULTI)  sv_catpv(RETVAL, "PAD_FAKELEX_MULTI,");
+        if (SvCUR(RETVAL) && (*(SvEND(RETVAL) - 1) == ',')) {
+#if defined(__clang__) && __clang_major__ <= 1 && __clang_minor__ < 8
+	  --SvCUR(RETVAL);
+	  SvPVX(RETVAL)[SvCUR(RETVAL)] = '\0';
+#else
+	  SvPVX(RETVAL)[--SvCUR(RETVAL)] = '\0';
+#endif
+	}
+    OUTPUT:
+        RETVAL
+
+#endif
+
+MODULE = B::Flags		PACKAGE = B::PADNAMELIST
+
+#ifdef newPADNAMELIST
+
+SV*
+flagspv(sv, ...)
+    B::SV sv
+    CODE:
+        RETVAL = newSVpvs("PADNAME");
+    OUTPUT:
+        RETVAL
+
+#endif
