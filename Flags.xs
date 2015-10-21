@@ -507,7 +507,7 @@ flagspv(sv, type=-1)
 				    sv_catpv(RETVAL, "PADNAME,");
           else
 #endif
-#ifdef SVpad_NAME /* since 5.10 */
+#ifdef SVpad_NAME /* 5.10 - 5.20 */
           if (flags & SVpad_NAME) {
             sv_catpv(RETVAL, "PADNAME,");
             if (flags & SVpad_TYPED)  sv_catpv(RETVAL, "TYPED,");
