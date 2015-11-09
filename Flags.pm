@@ -8,7 +8,7 @@ use warnings;
 
 require DynaLoader;
 our @ISA = qw(DynaLoader);
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 bootstrap B::Flags $VERSION;
 
@@ -64,6 +64,7 @@ GvFLAGS, CvFLAGS, ... in seperate struct fields.
 
 Note that only the names of bitmasked SV and OP flags are returned,
 not pseudo flags, like TAINTED, which is stored as magic.
+PAD, PADNAME, PADLIST and PADNAMELIST flags are now also supported.
 
 =back
 

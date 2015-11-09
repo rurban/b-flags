@@ -1,5 +1,15 @@
 Revision history for Perl extension B::Flags.
 
+0.15  2015-11-10 rurban
+	- add B::PADLIST support and tests
+        - add typed padname tests
+        - replace EVALED with TYPED for PVMG.
+          EVALED is only defined for rhs regexp.
+        - remove PADNAME, there is no such flag
+        - add NAMELIST for SVpad_NAMELIST with 5.20 only
+        - split AvFLAGS from SvFLAGS only where AvFLAGS are seperated
+          (5.6 - 5.8)
+
 0.14  2015-09-24 rurban
 	- add B::PADNAMELIST and B::PADNAME support and tests
 

@@ -504,31 +504,37 @@ flagspv(sv, type=-1)
 #endif
 #ifdef SVpad_NAMELIST /* 5.19.3 - 5.21 */
 	  if ((flags & SVpad_NAMELIST) && (sv_type == SVt_PVAV))
-				    sv_catpv(RETVAL, "PADNAME,");
+				    sv_catpv(RETVAL, "NAMELIST,");
           else
 #endif
-#ifdef SVpad_NAME /* 5.10 - 5.20 */
+#if PERL_VERSION < 22            
+#if defined(SVpad_NAME) /* 5.10 - 5.20, 5.22 see PADNAME */
           if (flags & SVpad_NAME) {
-            sv_catpv(RETVAL, "PADNAME,");
+            if (flags & SVpad_STATE)  sv_catpv(RETVAL, "STATE,");
             if (flags & SVpad_TYPED)  sv_catpv(RETVAL, "TYPED,");
             if (flags & SVpad_OUR)    sv_catpv(RETVAL, "OUR,");
-            if (flags & SVpad_STATE)  sv_catpv(RETVAL, "STATE,");
           }
           else
+#else /* 5.6 - 5.8 */
+#ifdef SVpad_TYPED
+          if (flags & SVpad_TYPED)  sv_catpv(RETVAL, "TYPED,");
+#endif
+          if (flags & SVpad_OUR)    sv_catpv(RETVAL, "OUR,");
+#endif
 #endif
 #ifdef SVprv_PCS_IMPORTED /* since 5.8.9, RV is a proxy for a constant */
           if (flags & SVf_ROK && flags & SVprv_PCS_IMPORTED)
-				      sv_catpv(RETVAL, "PCS_IMPORTED,");
+                                    sv_catpv(RETVAL, "PCS_IMPORTED,");
           else
 #endif
-          if (flags & SVp_SCREAM)     sv_catpv(RETVAL, "SCREAM,");
+          if (flags & SVp_SCREAM)   sv_catpv(RETVAL, "SCREAM,");
 #ifdef SVpav_REAL
-        if ((flags & SVpav_REAL) && (sv_type == SVt_PVAV))
-            sv_catpv(RETVAL, "REAL,");
+          if ((flags & SVpav_REAL) && (sv_type == SVt_PVAV))
+                                    sv_catpv(RETVAL, "REAL,");
 #endif
 #ifdef SVpav_REIFY
-        if ((flags & SVpav_REIFY) && (sv_type == SVt_PVAV)) 
-            sv_catpv(RETVAL, "REIFY,");
+          if ((flags & SVpav_REIFY) && (sv_type == SVt_PVAV)) 
+                                    sv_catpv(RETVAL, "REIFY,");
 #endif
 	}
 #ifdef SVf_IsCOW
@@ -540,7 +546,15 @@ flagspv(sv, type=-1)
         if (flags & SVf_THINKFIRST)
             sv_catpv(RETVAL, "THINKFIRST,");
 #endif
+        if (sv_type == SVt_PVHV) {
+          if (HvSHAREKEYS(sv))    sv_catpv(RETVAL, "SHAREKEYS,");
+          if (HvLAZYDEL(sv))      sv_catpv(RETVAL, "LAZYDEL,");
+        }
+      /*if (SvEVALED(sv))       sv_catpv(RETVAL, "EVALED,");*/ /* rhs regex only */
+        if (SvIsUV(sv))         sv_catpv(RETVAL, "IsUV,");
+        if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8");
         switch (type == -1 ? sv_type : type) {
+          /* CvFLAGS */
         case SVt_PVCV:
         case SVt_PVFM:
             if (CvANON(sv))         sv_catpv(RETVAL, "ANON,");
@@ -578,16 +592,29 @@ flagspv(sv, type=-1)
             if (CvCVGV_RC(sv))      sv_catpv(RETVAL, "CVGV_RC,");
 #endif
             break;
-        case SVt_PVHV:
-            if (HvSHAREKEYS(sv))    sv_catpv(RETVAL, "SHAREKEYS,");
-            if (HvLAZYDEL(sv))      sv_catpv(RETVAL, "LAZYDEL,");
+#ifdef AVf_REAL
+          /* AvFLAGS */
+        case SVt_PVAV:
+            if (AvREAL(sv))         sv_catpv(RETVAL, "REAL,");
+            if (AvREIFY(sv))        sv_catpv(RETVAL, "REIFY,");
+            if (AvREUSED(sv))       sv_catpv(RETVAL, "REUSED,");
             break;
+#endif
         case SVt_PVBM: /* == PVMG */
             if (!(flags & SVp_SCREAM)) {
                 if (SvTAIL(sv))         sv_catpv(RETVAL, "TAIL,");
                 if (SvVALID(sv))        sv_catpv(RETVAL, "VALID,");
             }
             break;
+#if SVt_PVBM != SVt_PVMG
+        case SVt_PVMG:
+#if PERL_VERSION < 10 && defined(SvPAD_TYPED) /* 5.8 */
+            if (SvPAD_TYPED(sv))    sv_catpv(RETVAL, "TYPED,");
+            if (SvPAD_OUR(sv))      sv_catpv(RETVAL, "OUR,");
+#endif
+            break;
+#endif
+          /* GvFLAGS */
         case SVt_PVGV:
             if (GvINTRO(sv))        sv_catpv(RETVAL, "INTRO,");
             if (GvMULTI(sv))        sv_catpv(RETVAL, "MULTI,");
@@ -611,7 +638,7 @@ flagspv(sv, type=-1)
             }
             /* FALL THROUGH */
         default:
-            if (SvEVALED(sv))       sv_catpv(RETVAL, "EVALED,");
+          /*sv_catpvf(RETVAL, "%d", sv_type); */
             if (SvIsUV(sv))         sv_catpv(RETVAL, "IsUV,");
             if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8");
             break;
@@ -640,10 +667,14 @@ flagspv(sv, type=-1)
     U32 sv_type = NO_INIT
     CODE:
         if (!sv) XSRETURN_UNDEF;
-        RETVAL = newSVpvs("PADNAME,");
+        RETVAL = newSVpvs("");
         pn = (PADNAME*)sv;
         flags = PadnameFLAGS(pn);
 	if (PadnameOUTER(pn)) 		sv_catpv(RETVAL, "OUTER,");
+	if (PadnameIsSTATE(pn)) 	sv_catpv(RETVAL, "STATE,");
+	if (PadnameLVALUE(pn)) 		sv_catpv(RETVAL, "LVALUE,");
+	if (SvPAD_TYPED(pn)) 		sv_catpv(RETVAL, "TYPED,");
+	if (SvPAD_OUR(pn)) 		sv_catpv(RETVAL, "OUR,");
         if (flags & PAD_FAKELEX_ANON)   sv_catpv(RETVAL, "PAD_FAKELEX_ANON,");
         if (flags & PAD_FAKELEX_MULTI)  sv_catpv(RETVAL, "PAD_FAKELEX_MULTI,");
         if (SvCUR(RETVAL) && (*(SvEND(RETVAL) - 1) == ',')) {
@@ -667,7 +698,21 @@ SV*
 flagspv(sv, ...)
     B::SV sv
     CODE:
-        RETVAL = newSVpvs("PADNAME");
+        RETVAL = newSVpvs("");
+    OUTPUT:
+        RETVAL
+
+#endif
+
+MODULE = B::Flags		PACKAGE = B::PADLIST
+
+#ifdef PadlistARRAY
+
+SV*
+flagspv(sv, ...)
+    B::SV sv
+    CODE:
+        RETVAL = newSVpvs("");
     OUTPUT:
         RETVAL
 
