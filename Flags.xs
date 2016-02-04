@@ -552,7 +552,7 @@ flagspv(sv, type=-1)
         }
       /*if (SvEVALED(sv))       sv_catpv(RETVAL, "EVALED,");*/ /* rhs regex only */
         if (SvIsUV(sv))         sv_catpv(RETVAL, "IsUV,");
-        if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8");
+        if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8,");
         switch (type == -1 ? sv_type : type) {
           /* CvFLAGS */
         case SVt_PVCV:
@@ -638,9 +638,7 @@ flagspv(sv, type=-1)
             }
             /* FALL THROUGH */
         default:
-          /*sv_catpvf(RETVAL, "%d", sv_type); */
-            if (SvIsUV(sv))         sv_catpv(RETVAL, "IsUV,");
-            if (SvUTF8(sv))         sv_catpv(RETVAL, "UTF8");
+            /*sv_catpvf(RETVAL, "%d", sv_type); */
             break;
         }
         if (SvCUR(RETVAL) && (*(SvEND(RETVAL) - 1) == ',')) {

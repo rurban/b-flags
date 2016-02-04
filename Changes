@@ -1,5 +1,8 @@
 Revision history for Perl extension B::Flags.
 
+0.16  2016-02-04 rurban
+	- fix duplicate UTF8 and IsUV
+
 0.15  2015-11-10 rurban
 	- add B::PADLIST support and tests
         - add typed padname tests
